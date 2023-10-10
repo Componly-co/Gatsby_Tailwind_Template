@@ -7,7 +7,29 @@ const onCreateNode = require("./src/gatsby-utils/onCreateNode");
 const createSchemaCustomization = require("./src/gatsby-utils/createSchemaCustomization");
 const createResolvers = require("./src/gatsby-utils/createResolvers");
 
-exports.onCreateWebpackConfig = ({ actions }) => {
+exports.onCreateWebpackConfig = ({ actions, getConfig }) => {
+    const config = getConfig();
+    
+    config.module.rules.push({
+        test: /\.(js|mjs|jsx|ts|tsx)$/,
+        include: [
+            path.resolve(process.cwd(), 'src'),
+            path.resolve(process.cwd(), 'pages')
+        ],
+        use: [
+            {
+                loader: 'babel-loader',
+                options: {
+                    presets: ["@babel/preset-typescript"],
+                    plugins: [
+                        '@babel/plugin-syntax-jsx',
+                        '@componly/babel-plugin',
+                    ]
+                },
+            },
+        ],
+    });
+    
     actions.setWebpackConfig({
         resolve: {
             alias: {
@@ -23,6 +45,7 @@ exports.onCreateWebpackConfig = ({ actions }) => {
                 "@data": path.resolve(__dirname, "./src/data"),
             },
         },
+        ...config
     });
 };
 
